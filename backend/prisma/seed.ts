@@ -8,7 +8,7 @@ async function main() {
 
   // Usuário principal: teamo / 1105
   const passwordHashPrincipal = await bcrypt.hash('1105', 10)
-  const passwordHashAna = await bcrypt.hash('teamo', 10)
+  const passwordHashJulia = await bcrypt.hash('teamo', 10)
 
   const edu = await prisma.user.upsert({
     where: { email: 'teamo@cantinho.app' },
@@ -16,10 +16,10 @@ async function main() {
     create: { name: 'Eduardo', email: 'teamo@cantinho.app', passwordHash: passwordHashPrincipal },
   })
 
-  const ana = await prisma.user.upsert({
-    where: { email: 'ana@cantinho.app' },
+  const julia = await prisma.user.upsert({
+    where: { email: 'julia@cantinho.app' },
     update: {},
-    create: { name: 'Ana', email: 'ana@cantinho.app', passwordHash: passwordHashAna },
+    create: { name: 'Julia', email: 'julia@cantinho.app', passwordHash: passwordHashJulia },
   })
 
   const books = await Promise.all([
@@ -96,15 +96,15 @@ async function main() {
   })
 
   await prisma.userBook.upsert({
-    where: { userId_bookId: { userId: ana.id, bookId: books[1].id } },
+    where: { userId_bookId: { userId: julia.id, bookId: books[1].id } },
     update: {},
-    create: { userId: ana.id, bookId: books[1].id, status: 'READING', currentPage: 120, startedAt: new Date() },
+    create: { userId: julia.id, bookId: books[1].id, status: 'READING', currentPage: 120, startedAt: new Date() },
   })
 
   await prisma.userBook.upsert({
-    where: { userId_bookId: { userId: ana.id, bookId: books[3].id } },
+    where: { userId_bookId: { userId: julia.id, bookId: books[3].id } },
     update: {},
-    create: { userId: ana.id, bookId: books[3].id, status: 'READ', currentPage: 320, rating: 4, startedAt: new Date(Date.now() - 15 * 86400000), finishedAt: new Date() },
+    create: { userId: julia.id, bookId: books[3].id, status: 'READ', currentPage: 320, rating: 4, startedAt: new Date(Date.now() - 15 * 86400000), finishedAt: new Date() },
   })
 
   // Seed reading logs for streak demonstration
@@ -125,7 +125,7 @@ async function main() {
 
   console.log('✅ Seed concluído!')
   console.log('👤 Login principal: teamo@cantinho.app / senha: 1105')
-  console.log('👤 Login Ana: ana@cantinho.app / senha: teamo')
+  console.log('👤 Login Julia: julia@cantinho.app / senha: teamo')
 }
 
 main()

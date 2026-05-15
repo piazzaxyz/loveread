@@ -1,25 +1,26 @@
 import { NavLink } from 'react-router-dom'
+import { LayoutDashboard, Library, Calendar } from 'lucide-react'
 import styles from './BottomNav.module.css'
 
 const navItems = [
-  { to: '/dashboard', icon: '📊', label: 'Dashboard' },
-  { to: '/library', icon: '📚', label: 'Biblioteca' },
-  { to: '/calendar', icon: '📅', label: 'Calendário' },
+  { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+  { to: '/library', icon: Library, label: 'Biblioteca' },
+  { to: '/calendar', icon: Calendar, label: 'Calendário' },
 ]
 
 export function BottomNav() {
   return (
     <nav className={styles.bottomNav}>
-      {navItems.map((item) => (
+      {navItems.map(({ to, icon: Icon, label }) => (
         <NavLink
-          key={item.to}
-          to={item.to}
+          key={to}
+          to={to}
           className={({ isActive }) =>
             `${styles.navItem} ${isActive ? styles.active : ''}`
           }
         >
-          <span className={styles.icon}>{item.icon}</span>
-          <span className={styles.label}>{item.label}</span>
+          <Icon size={22} />
+          <span className={styles.label}>{label}</span>
         </NavLink>
       ))}
     </nav>
