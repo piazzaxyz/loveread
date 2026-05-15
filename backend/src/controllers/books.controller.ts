@@ -38,7 +38,7 @@ export async function getUserLibrary(req: AuthRequest, res: Response): Promise<v
 
 export async function getUserBook(req: AuthRequest, res: Response): Promise<void> {
   try {
-    const ub = await booksService.getUserBook(req.userId!, req.params.id)
+    const ub = await booksService.getUserBook(req.userId!, req.params.id as string)
     res.json(ub)
   } catch (err: any) {
     res.status(404).json({ message: err.message })
@@ -75,7 +75,7 @@ export async function addBookAndToLibrary(req: AuthRequest, res: Response): Prom
 
 export async function updateUserBook(req: AuthRequest, res: Response): Promise<void> {
   try {
-    const ub = await booksService.updateUserBook(req.userId!, req.params.id, req.body)
+    const ub = await booksService.updateUserBook(req.userId!, req.params.id as string, req.body)
     res.json(ub)
   } catch (err: any) {
     res.status(400).json({ message: err.message })
@@ -84,7 +84,7 @@ export async function updateUserBook(req: AuthRequest, res: Response): Promise<v
 
 export async function removeBookFromLibrary(req: AuthRequest, res: Response): Promise<void> {
   try {
-    await booksService.removeBookFromLibrary(req.userId!, req.params.id)
+    await booksService.removeBookFromLibrary(req.userId!, req.params.id as string)
     res.status(204).end()
   } catch (err: any) {
     res.status(404).json({ message: err.message })

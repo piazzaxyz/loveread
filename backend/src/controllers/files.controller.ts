@@ -34,7 +34,7 @@ export async function uploadFile(req: AuthRequest, res: Response): Promise<void>
 
 export async function getFiles(req: AuthRequest, res: Response): Promise<void> {
   try {
-    const files = await filesService.getFiles(req.userId!, req.params.userBookId)
+    const files = await filesService.getFiles(req.userId!, req.params.userBookId as string)
     res.json(files)
   } catch (err: any) {
     res.status(400).json({ message: err.message })
@@ -43,7 +43,7 @@ export async function getFiles(req: AuthRequest, res: Response): Promise<void> {
 
 export async function deleteFile(req: AuthRequest, res: Response): Promise<void> {
   try {
-    await filesService.deleteFile(req.userId!, req.params.id)
+    await filesService.deleteFile(req.userId!, req.params.id as string)
     res.status(204).end()
   } catch (err: any) {
     res.status(404).json({ message: err.message })

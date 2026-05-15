@@ -7,7 +7,7 @@ export async function logReading(
   pagesRead: number,
   minutesRead: number
 ) {
-  const ub = await prisma.userBook.findFirst({ where: { id: userBookId, userId } })
+  const ub = await prisma.userBook.findFirst({ where: { id: userBookId, userId }, include: { book: true } })
   if (!ub) throw new Error('Livro não encontrado')
 
   const log = await prisma.readingLog.upsert({
@@ -17,7 +17,7 @@ export async function logReading(
   })
 
   if (pagesRead > 0 && ub.book) {
-    const newPage = Math.min(ub.currentPage + pagesRead, (ub as any).book?.totalPages || 9999)
+    const newPage = Math.min(ub.currentPage + pagesRead, ub.book.totalPages || 9999)
     await prisma.userBook.update({ where: { id: userBookId }, data: { currentPage: newPage } })
   }
 
