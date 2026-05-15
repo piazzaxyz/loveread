@@ -174,7 +174,7 @@ const RANK_LABELS = ['1°', '2°', '3°']
 
 function LeaderboardCard({ user, rank, onClick }: { user: UserStats; rank: number; onClick: () => void }) {
   return (
-    <Card className={styles.leaderCard} onClick={onClick} style={{ cursor: 'pointer' }}>
+    <Card className={`${styles.leaderCard} ${styles.leaderCardClickable}`} onClick={onClick}>
       <div className={styles.rankBadge}>{RANK_LABELS[rank - 1] || `#${rank}`}</div>
       <div className={styles.leaderAvatar}>
         {user.avatarUrl ? <img src={user.avatarUrl} alt={user.name} /> : <span>{user.name[0].toUpperCase()}</span>}
