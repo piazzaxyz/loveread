@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
-import { UserBook, ReadingStatus, STATUS_LABELS } from '@/types'
+import { Plus, BookOpen, CheckCircle, Bookmark, ShoppingCart, XCircle } from 'lucide-react'
+import { UserBook, ReadingStatus } from '@/types'
 import { booksService } from '@/services/books.service'
 import { BookCard } from '../components/BookCard'
 import { BookForm } from '../components/BookForm'
@@ -8,13 +9,13 @@ import { Modal } from '@/components/ui/Modal'
 import { Button } from '@/components/ui/Button'
 import styles from './LibraryPage.module.css'
 
-const FILTER_OPTIONS: { value: ReadingStatus | 'ALL'; label: string }[] = [
-  { value: 'ALL', label: '📚 Todos' },
-  { value: 'READING', label: '📖 Lendo' },
-  { value: 'READ', label: '✅ Lidos' },
-  { value: 'WANT_TO_READ', label: '🔖 Quero Ler' },
-  { value: 'WANT_TO_BUY', label: '🛒 Quero Comprar' },
-  { value: 'ABANDONED', label: '❌ Abandonados' },
+const FILTER_OPTIONS: { value: ReadingStatus | 'ALL'; label: string; icon: React.ReactNode }[] = [
+  { value: 'ALL', label: 'Todos', icon: <BookOpen size={14} /> },
+  { value: 'READING', label: 'Lendo', icon: <BookOpen size={14} /> },
+  { value: 'READ', label: 'Lidos', icon: <CheckCircle size={14} /> },
+  { value: 'WANT_TO_READ', label: 'Quero Ler', icon: <Bookmark size={14} /> },
+  { value: 'WANT_TO_BUY', label: 'Quero Comprar', icon: <ShoppingCart size={14} /> },
+  { value: 'ABANDONED', label: 'Abandonados', icon: <XCircle size={14} /> },
 ]
 
 export function LibraryPage() {
@@ -40,16 +41,8 @@ export function LibraryPage() {
   const filtered = library.filter((ub) => {
     if (!search) return true
     const q = search.toLowerCase()
-    return (
-      ub.book.title.toLowerCase().includes(q) ||
-      ub.book.author.toLowerCase().includes(q)
-    )
+    return ub.book.title.toLowerCase().includes(q) || ub.book.author.toLowerCase().includes(q)
   })
-
-  const handleAddSuccess = () => {
-    setShowAddModal(false)
-    load()
-  }
 
   return (
     <div className={styles.page}>
@@ -58,7 +51,9 @@ export function LibraryPage() {
           <h1 className={styles.title}>Minha Biblioteca</h1>
           <p className={styles.subtitle}>{library.length} livro{library.length !== 1 ? 's' : ''} na sua coleção</p>
         </div>
-        <Button onClick={() => setShowAddModal(true)}>+ Adicionar Livro</Button>
+        <Button onClick={() => setShowAddModal(true)}>
+          <Plus size={16} /> Adicionar Livro
+        </Button>
       </div>
 
       <div className={styles.controls}>
@@ -69,13 +64,13 @@ export function LibraryPage() {
               className={`${styles.filterBtn} ${filter === opt.value ? styles.activeFilter : ''}`}
               onClick={() => setFilter(opt.value)}
             >
-              {opt.label}
+              {opt.icon} {opt.label}
             </button>
           ))}
         </div>
         <input
           className={styles.searchInput}
-          placeholder="🔍 Buscar por título ou autor..."
+          placeholder="Buscar por título ou autor..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -88,48 +83,25 @@ export function LibraryPage() {
         </div>
       ) : filtered.length === 0 ? (
         <div className={styles.empty}>
-          <span className={styles.emptyEmoji}>📚</span>
+          <BookOpen size={64} color="var(--text-muted)" strokeWidth={1} />
           <h3>Nenhum livro encontrado</h3>
-          <p>
-            {search
-              ? 'Tente buscar por outro termo'
-              : 'Adicione seu primeiro livro clicando no botão acima!'}
-          </p>
+          <p>{search ? 'Tente buscar por outro termo' : 'Adicione seu primeiro livro clicando no botão acima!'}</p>
         </div>
       ) : (
         <div className={styles.grid}>
           {filtered.map((ub) => (
-            <BookCard
-              key={ub.id}
-              userBook={ub}
-              onUpdate={load}
-              onSelect={setSelectedBook}
-            />
+            <BookCard key={ub.id} userBook={ub} onUpdate={load} onSelect={setSelectedBook} />
           ))}
         </div>
       )}
 
-      <Modal
-        isOpen={showAddModal}
-        onClose={() => setShowAddModal(false)}
-        title="Adicionar Livro"
-        size="lg"
-      >
-        <BookForm onSuccess={handleAddSuccess} onCancel={() => setShowAddModal(false)} />
+      <Modal isOpen={showAddModal} onClose={() => setShowAddModal(false)} title="Adicionar Livro" size="lg">
+        <BookForm onSuccess={() => { setShowAddModal(false); load() }} onCancel={() => setShowAddModal(false)} />
       </Modal>
 
-      <Modal
-        isOpen={!!selectedBook}
-        onClose={() => setSelectedBook(null)}
-        title="Detalhes do Livro"
-        size="lg"
-      >
+      <Modal isOpen={!!selectedBook} onClose={() => setSelectedBook(null)} title="Detalhes do Livro" size="lg">
         {selectedBook && (
-          <BookDetail
-            userBook={selectedBook}
-            onUpdate={load}
-            onClose={() => setSelectedBook(null)}
-          />
+          <BookDetail userBook={selectedBook} onUpdate={load} onClose={() => setSelectedBook(null)} />
         )}
       </Modal>
     </div>

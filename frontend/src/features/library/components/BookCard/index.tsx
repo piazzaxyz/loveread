@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { UserBook, STATUS_LABELS, ReadingStatus } from '@/types'
+import { FileText, Paperclip, Star, Eye } from 'lucide-react'
+import { UserBook, ReadingStatus } from '@/types'
 import { Badge } from '@/components/ui/Badge'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import { Button } from '@/components/ui/Button'
@@ -43,6 +44,7 @@ export function BookCard({ userBook, onUpdate, onSelect }: BookCardProps) {
           onError={(e) => { (e.target as HTMLImageElement).src = BOOK_PLACEHOLDER }}
         />
         <div className={styles.overlay}>
+          <Eye size={18} />
           <span>Ver detalhes</span>
         </div>
       </div>
@@ -56,11 +58,7 @@ export function BookCard({ userBook, onUpdate, onSelect }: BookCardProps) {
 
         {userBook.status === 'READING' && book.totalPages && (
           <div className={styles.progress}>
-            <ProgressBar
-              current={userBook.currentPage}
-              total={book.totalPages}
-              size="sm"
-            />
+            <ProgressBar current={userBook.currentPage} total={book.totalPages} size="sm" />
             {showPageInput ? (
               <div className={styles.pageInputRow}>
                 <input
@@ -85,14 +83,17 @@ export function BookCard({ userBook, onUpdate, onSelect }: BookCardProps) {
         )}
 
         <div className={styles.meta}>
-          {userBook._count && (
-            <span title="Notas">📝 {userBook._count.notes}</span>
+          {userBook._count && userBook._count.notes > 0 && (
+            <span title="Notas"><FileText size={12} /> {userBook._count.notes}</span>
           )}
-          {userBook._count && (
-            <span title="Arquivos">📄 {userBook._count.files}</span>
+          {userBook._count && userBook._count.files > 0 && (
+            <span title="Arquivos"><Paperclip size={12} /> {userBook._count.files}</span>
           )}
           {userBook.rating && (
-            <span title="Avaliação">{'⭐'.repeat(userBook.rating)}</span>
+            <span title="Avaliação" className={styles.rating}>
+              <Star size={12} fill="currentColor" />
+              {userBook.rating}
+            </span>
           )}
         </div>
       </div>

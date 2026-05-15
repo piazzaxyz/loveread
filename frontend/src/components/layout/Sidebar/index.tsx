@@ -1,12 +1,13 @@
 import { NavLink } from 'react-router-dom'
+import { BookOpen, LayoutDashboard, Library, Calendar, Sun, Moon, LogOut, User } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useTheme } from '@/contexts/ThemeContext'
 import styles from './Sidebar.module.css'
 
 const navItems = [
-  { to: '/dashboard', icon: '📊', label: 'Dashboard' },
-  { to: '/library', icon: '📚', label: 'Biblioteca' },
-  { to: '/calendar', icon: '📅', label: 'Calendário' },
+  { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+  { to: '/library', icon: Library, label: 'Biblioteca' },
+  { to: '/calendar', icon: Calendar, label: 'Calendário' },
 ]
 
 export function Sidebar() {
@@ -16,28 +17,28 @@ export function Sidebar() {
   return (
     <aside className={styles.sidebar}>
       <div className={styles.logo}>
-        <span className={styles.logoIcon}>📖</span>
+        <BookOpen size={26} color="var(--accent)" />
         <span className={styles.logoText}>Cantinho do Leitor</span>
       </div>
 
       <nav className={styles.nav}>
-        {navItems.map((item) => (
+        {navItems.map(({ to, icon: Icon, label }) => (
           <NavLink
-            key={item.to}
-            to={item.to}
+            key={to}
+            to={to}
             className={({ isActive }) =>
               `${styles.navItem} ${isActive ? styles.active : ''}`
             }
           >
-            <span className={styles.navIcon}>{item.icon}</span>
-            <span className={styles.navLabel}>{item.label}</span>
+            <Icon size={18} />
+            <span className={styles.navLabel}>{label}</span>
           </NavLink>
         ))}
       </nav>
 
       <div className={styles.footer}>
-        <button className={styles.themeBtn} onClick={toggleTheme} title="Trocar tema">
-          {theme === 'dark' ? '☀️' : '🌙'}
+        <button className={styles.themeBtn} onClick={toggleTheme}>
+          {theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
           <span>{theme === 'dark' ? 'Modo Claro' : 'Modo Escuro'}</span>
         </button>
 
@@ -46,7 +47,7 @@ export function Sidebar() {
             {user?.avatarUrl ? (
               <img src={user.avatarUrl} alt={user.name} />
             ) : (
-              <span>{user?.name?.[0]?.toUpperCase()}</span>
+              <User size={15} />
             )}
           </div>
           <div className={styles.userText}>
@@ -56,7 +57,8 @@ export function Sidebar() {
         </div>
 
         <button className={styles.logoutBtn} onClick={logout}>
-          🚪 Sair
+          <LogOut size={14} />
+          Sair
         </button>
       </div>
     </aside>

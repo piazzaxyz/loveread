@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
+import { TrendingUp, FileText, Paperclip, Star, CalendarCheck } from 'lucide-react'
 import { UserBook, ReadingStatus, STATUS_LABELS } from '@/types'
 import { Badge } from '@/components/ui/Badge'
 import { ProgressBar } from '@/components/ui/ProgressBar'
@@ -58,9 +59,11 @@ export function BookDetail({ userBook: initialUb, onUpdate, onClose }: BookDetai
     }
   }
 
-  const pct = ub.book.totalPages
-    ? Math.min(Math.round((ub.currentPage / ub.book.totalPages) * 100), 100)
-    : 0
+  const tabs: { id: Tab; icon: React.ReactNode; label: string }[] = [
+    { id: 'progress', icon: <TrendingUp size={14} />, label: 'Progresso' },
+    { id: 'notes', icon: <FileText size={14} />, label: 'Notas' },
+    { id: 'files', icon: <Paperclip size={14} />, label: 'Arquivos' },
+  ]
 
   return (
     <div className={styles.detail}>
@@ -76,24 +79,20 @@ export function BookDetail({ userBook: initialUb, onUpdate, onClose }: BookDetai
           <h2 className={styles.bookTitle}>{ub.book.title}</h2>
           <p className={styles.bookAuthor}>{ub.book.author}</p>
           {ub.book.genre && <span className={styles.genre}>{ub.book.genre}</span>}
-          {ub.book.publishedYear && (
-            <span className={styles.year}>{ub.book.publishedYear}</span>
-          )}
+          {ub.book.publishedYear && <span className={styles.year}>{ub.book.publishedYear}</span>}
           <Badge status={ub.status} />
-          {ub.book.description && (
-            <p className={styles.description}>{ub.book.description}</p>
-          )}
+          {ub.book.description && <p className={styles.description}>{ub.book.description}</p>}
         </div>
       </div>
 
       <div className={styles.tabs}>
-        {(['progress', 'notes', 'files'] as Tab[]).map((t) => (
+        {tabs.map((t) => (
           <button
-            key={t}
-            className={`${styles.tabBtn} ${tab === t ? styles.activeTab : ''}`}
-            onClick={() => setTab(t)}
+            key={t.id}
+            className={`${styles.tabBtn} ${tab === t.id ? styles.activeTab : ''}`}
+            onClick={() => setTab(t.id)}
           >
-            {t === 'progress' ? '📈 Progresso' : t === 'notes' ? '📝 Notas' : '📄 Arquivos'}
+            {t.icon} {t.label}
           </button>
         ))}
       </div>
@@ -102,11 +101,7 @@ export function BookDetail({ userBook: initialUb, onUpdate, onClose }: BookDetai
         <div className={styles.progressTab}>
           <div className={styles.section}>
             <h3 className={styles.sectionTitle}>Status</h3>
-            <select
-              className={styles.select}
-              value={status}
-              onChange={(e) => setStatus(e.target.value as ReadingStatus)}
-            >
+            <select className={styles.select} value={status} onChange={(e) => setStatus(e.target.value as ReadingStatus)}>
               {STATUS_OPTIONS.map((s) => (
                 <option key={s} value={s}>{STATUS_LABELS[s]}</option>
               ))}
@@ -135,13 +130,13 @@ export function BookDetail({ userBook: initialUb, onUpdate, onClose }: BookDetai
           <div className={styles.section}>
             <h3 className={styles.sectionTitle}>Avaliação</h3>
             <div className={styles.stars}>
-              {[1,2,3,4,5].map((star) => (
+              {[1, 2, 3, 4, 5].map((star) => (
                 <button
                   key={star}
                   className={`${styles.star} ${star <= rating ? styles.starActive : ''}`}
                   onClick={() => setRating(star === rating ? 0 : star)}
                 >
-                  ★
+                  <Star size={24} fill={star <= rating ? 'currentColor' : 'none'} />
                 </button>
               ))}
             </div>
@@ -156,38 +151,19 @@ export function BookDetail({ userBook: initialUb, onUpdate, onClose }: BookDetai
             <div className={styles.sessionForm}>
               <div className={styles.sessionField}>
                 <label>Data</label>
-                <input
-                  type="date"
-                  className={styles.pageInput}
-                  value={logDate}
-                  onChange={(e) => setLogDate(e.target.value)}
-                />
+                <input type="date" className={styles.pageInput} value={logDate} onChange={(e) => setLogDate(e.target.value)} />
               </div>
               <div className={styles.sessionField}>
                 <label>Páginas lidas</label>
-                <input
-                  type="number"
-                  className={styles.pageInput}
-                  value={logPages}
-                  onChange={(e) => setLogPages(e.target.value)}
-                  placeholder="0"
-                  min={0}
-                />
+                <input type="number" className={styles.pageInput} value={logPages} onChange={(e) => setLogPages(e.target.value)} placeholder="0" min={0} />
               </div>
               <div className={styles.sessionField}>
                 <label>Minutos</label>
-                <input
-                  type="number"
-                  className={styles.pageInput}
-                  value={logMinutes}
-                  onChange={(e) => setLogMinutes(e.target.value)}
-                  placeholder="0"
-                  min={0}
-                />
+                <input type="number" className={styles.pageInput} value={logMinutes} onChange={(e) => setLogMinutes(e.target.value)} placeholder="0" min={0} />
               </div>
             </div>
             <Button variant="secondary" onClick={logSession} loading={loggingSession} fullWidth>
-              📅 Registrar no Calendário
+              <CalendarCheck size={15} /> Registrar no Calendário
             </Button>
           </div>
         </div>

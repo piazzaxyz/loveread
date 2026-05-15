@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Plus, Pencil, Trash2, ChevronLeft, Bold, Italic, List, ListOrdered, Heading2, FileText, ClipboardList } from 'lucide-react'
 import { BookNote, NoteType } from '@/types'
 import { notesService } from '@/services/notes.service'
 import { Button } from '@/components/ui/Button'
@@ -94,30 +95,23 @@ export function NotesPanel({ userBookId }: NotesPanelProps) {
       <div className={styles.panel}>
         <div className={styles.formHeader}>
           <h3>{editingNote ? 'Editar Nota' : 'Nova Nota'}</h3>
-          <button onClick={() => setShowForm(false)} className={styles.backBtn}>← Voltar</button>
+          <button onClick={() => setShowForm(false)} className={styles.backBtn}>
+            <ChevronLeft size={16} /> Voltar
+          </button>
         </div>
         <div className={styles.formBody}>
-          <input
-            className={styles.titleInput}
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Título da nota"
-          />
-          <select
-            className={styles.typeSelect}
-            value={noteType}
-            onChange={(e) => setNoteType(e.target.value as NoteType)}
-          >
-            <option value="NOTE">📝 Nota</option>
-            <option value="SUMMARY">📋 Resumo</option>
+          <input className={styles.titleInput} value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Título da nota" />
+          <select className={styles.typeSelect} value={noteType} onChange={(e) => setNoteType(e.target.value as NoteType)}>
+            <option value="NOTE">Nota</option>
+            <option value="SUMMARY">Resumo</option>
           </select>
           <div className={styles.editorWrapper}>
             <div className={styles.toolbar}>
-              <button onClick={() => editor?.chain().focus().toggleBold().run()} className={editor?.isActive('bold') ? styles.active : ''}>B</button>
-              <button onClick={() => editor?.chain().focus().toggleItalic().run()} className={editor?.isActive('italic') ? styles.active : ''}>I</button>
-              <button onClick={() => editor?.chain().focus().toggleBulletList().run()} className={editor?.isActive('bulletList') ? styles.active : ''}>•</button>
-              <button onClick={() => editor?.chain().focus().toggleOrderedList().run()} className={editor?.isActive('orderedList') ? styles.active : ''}>1.</button>
-              <button onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()} className={editor?.isActive('heading') ? styles.active : ''}>H2</button>
+              <button onClick={() => editor?.chain().focus().toggleBold().run()} className={editor?.isActive('bold') ? styles.active : ''}><Bold size={14} /></button>
+              <button onClick={() => editor?.chain().focus().toggleItalic().run()} className={editor?.isActive('italic') ? styles.active : ''}><Italic size={14} /></button>
+              <button onClick={() => editor?.chain().focus().toggleBulletList().run()} className={editor?.isActive('bulletList') ? styles.active : ''}><List size={14} /></button>
+              <button onClick={() => editor?.chain().focus().toggleOrderedList().run()} className={editor?.isActive('orderedList') ? styles.active : ''}><ListOrdered size={14} /></button>
+              <button onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()} className={editor?.isActive('heading') ? styles.active : ''}><Heading2 size={14} /></button>
             </div>
             <EditorContent editor={editor} className={styles.editor} />
           </div>
@@ -134,13 +128,15 @@ export function NotesPanel({ userBookId }: NotesPanelProps) {
     <div className={styles.panel}>
       <div className={styles.panelHeader}>
         <span>{notes.length} nota{notes.length !== 1 ? 's' : ''}</span>
-        <Button size="sm" onClick={() => openForm()}>+ Nova nota</Button>
+        <Button size="sm" onClick={() => openForm()}>
+          <Plus size={14} /> Nova nota
+        </Button>
       </div>
       {loading ? (
         <div className={styles.loading}>Carregando...</div>
       ) : notes.length === 0 ? (
         <div className={styles.empty}>
-          <span>📝</span>
+          <FileText size={36} color="var(--text-muted)" strokeWidth={1} />
           <p>Nenhuma nota ainda. Adicione anotações e resumos!</p>
         </div>
       ) : (
@@ -148,11 +144,13 @@ export function NotesPanel({ userBookId }: NotesPanelProps) {
           {notes.map((note) => (
             <div key={note.id} className={styles.noteItem}>
               <div className={styles.noteHeader}>
-                <span className={styles.noteType}>{note.type === 'SUMMARY' ? '📋' : '📝'}</span>
+                {note.type === 'SUMMARY'
+                  ? <ClipboardList size={15} color="var(--accent)" />
+                  : <FileText size={15} color="var(--accent)" />}
                 <h4 className={styles.noteTitle}>{note.title}</h4>
                 <div className={styles.noteActions}>
-                  <button onClick={() => openForm(note)} className={styles.actionBtn}>✏️</button>
-                  <button onClick={() => remove(note.id)} className={`${styles.actionBtn} ${styles.deleteBtn}`}>🗑️</button>
+                  <button onClick={() => openForm(note)} className={styles.actionBtn}><Pencil size={13} /></button>
+                  <button onClick={() => remove(note.id)} className={`${styles.actionBtn} ${styles.deleteBtn}`}><Trash2 size={13} /></button>
                 </div>
               </div>
               <p className={styles.notePreview}>{renderContent(note.content)}</p>

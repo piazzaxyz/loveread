@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { Upload, FileText, Trash2 } from 'lucide-react'
 import { BookFile } from '@/types'
 import { filesService } from '@/services/files.service'
 import { Button } from '@/components/ui/Button'
@@ -51,8 +52,7 @@ export function FilesPanel({ userBookId }: FilesPanelProps) {
 
   const formatSize = (kb?: number) => {
     if (!kb) return ''
-    if (kb > 1024) return `${(kb / 1024).toFixed(1)} MB`
-    return `${kb} KB`
+    return kb > 1024 ? `${(kb / 1024).toFixed(1)} MB` : `${kb} KB`
   }
 
   return (
@@ -60,21 +60,14 @@ export function FilesPanel({ userBookId }: FilesPanelProps) {
       <div className={styles.panelHeader}>
         <span>{files.length} arquivo{files.length !== 1 ? 's' : ''}</span>
         <Button size="sm" onClick={() => inputRef.current?.click()} loading={uploading}>
-          {uploading ? `${uploadProgress}%` : '+ Upload PDF'}
+          <Upload size={14} /> {uploading ? `${uploadProgress}%` : 'Upload PDF'}
         </Button>
-        <input
-          ref={inputRef}
-          type="file"
-          accept="application/pdf"
-          onChange={handleUpload}
-          style={{ display: 'none' }}
-        />
+        <input ref={inputRef} type="file" accept="application/pdf" onChange={handleUpload} style={{ display: 'none' }} />
       </div>
 
       {uploading && (
         <div className={styles.uploadProgress}>
           <div className={styles.progressBar} style={{ width: `${uploadProgress}%` }} />
-          <span>Enviando... {uploadProgress}%</span>
         </div>
       )}
 
@@ -82,33 +75,24 @@ export function FilesPanel({ userBookId }: FilesPanelProps) {
         <div className={styles.loading}>Carregando...</div>
       ) : files.length === 0 ? (
         <div className={styles.empty}>
-          <span>📄</span>
+          <FileText size={36} color="var(--text-muted)" strokeWidth={1} />
           <p>Nenhum arquivo ainda. Faça upload do PDF do livro!</p>
         </div>
       ) : (
         <div className={styles.filesList}>
           {files.map((file) => (
             <div key={file.id} className={styles.fileItem}>
-              <span className={styles.fileIcon}>📄</span>
+              <FileText size={20} color="var(--accent)" />
               <div className={styles.fileInfo}>
-                <a
-                  href={file.fileUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={styles.fileName}
-                >
+                <a href={file.fileUrl} target="_blank" rel="noopener noreferrer" className={styles.fileName}>
                   {file.filename}
                 </a>
                 <span className={styles.fileMeta}>
                   {formatSize(file.fileSizeKb)} · {new Date(file.createdAt).toLocaleDateString('pt-BR')}
                 </span>
               </div>
-              <button
-                className={styles.deleteBtn}
-                onClick={() => remove(file.id)}
-                title="Deletar"
-              >
-                🗑️
+              <button className={styles.deleteBtn} onClick={() => remove(file.id)} title="Deletar">
+                <Trash2 size={15} />
               </button>
             </div>
           ))}

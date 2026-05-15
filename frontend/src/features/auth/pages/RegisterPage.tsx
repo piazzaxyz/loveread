@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { BookOpen, Sun, Moon } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useTheme } from '@/contexts/ThemeContext'
 import { Button } from '@/components/ui/Button'
@@ -32,11 +33,11 @@ export function RegisterPage() {
   return (
     <div className={styles.page}>
       <button className={styles.themeToggle} onClick={toggleTheme}>
-        {theme === 'dark' ? '☀️' : '🌙'}
+        {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
       </button>
       <div className={styles.card}>
         <div className={styles.logoArea}>
-          <span className={styles.logoEmoji}>📖</span>
+          <BookOpen size={48} color="var(--accent)" strokeWidth={1.5} />
           <h1 className={styles.appName}>Cantinho do Leitor</h1>
           <p className={styles.tagline}>Crie seu espaço de leitura.</p>
         </div>
@@ -88,8 +89,7 @@ export function RegisterPage() {
           </Button>
 
           <p className={styles.switchLink}>
-            Já tem conta?{' '}
-            <Link to="/login">Entrar</Link>
+            Já tem conta? <Link to="/login">Entrar</Link>
           </p>
         </form>
       </div>
