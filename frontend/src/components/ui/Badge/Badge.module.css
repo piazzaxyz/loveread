@@ -1,0 +1,15 @@
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.reading  { background: rgba(137,180,250,0.2); color: var(--color-blue); }
+.read     { background: rgba(166,227,161,0.2); color: var(--color-green); }
+.wantToRead { background: rgba(203,166,247,0.2); color: var(--color-mauve); }
+.wantToBuy  { background: rgba(249,226,175,0.2); color: var(--color-yellow); }
+.abandoned  { background: rgba(243,139,168,0.2); color: var(--color-red); }
