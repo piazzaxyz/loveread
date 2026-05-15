@@ -1,0 +1,113 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  avatarUrl    String?  @map("avatar_url")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  userBooks   UserBook[]
+  readingLogs ReadingLog[]
+  notes       BookNote[]
+  files       BookFile[]
+
+  @@map("users")
+}
+
+model Book {
+  id            String   @id @default(cuid())
+  title         String
+  author        String
+  coverUrl      String?  @map("cover_url")
+  totalPages    Int?     @map("total_pages")
+  genre         String?
+  isbn          String?  @unique
+  description   String?
+  publishedYear Int?     @map("published_year")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  userBooks UserBook[]
+
+  @@map("books")
+}
+
+model UserBook {
+  id          String    @id @default(cuid())
+  userId      String    @map("user_id")
+  bookId      String    @map("book_id")
+  // status: READING | READ | WANT_TO_READ | WANT_TO_BUY | ABANDONED
+  status      String    @default("WANT_TO_READ")
+  currentPage Int       @default(0) @map("current_page")
+  rating      Int?
+  startedAt   DateTime? @map("started_at")
+  finishedAt  DateTime? @map("finished_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  book        Book         @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  readingLogs ReadingLog[]
+  notes       BookNote[]
+  files       BookFile[]
+
+  @@unique([userId, bookId])
+  @@map("user_books")
+}
+
+model ReadingLog {
+  id          String   @id @default(cuid())
+  userId      String   @map("user_id")
+  userBookId  String   @map("user_book_id")
+  date        String
+  pagesRead   Int      @default(0) @map("pages_read")
+  minutesRead Int      @default(0) @map("minutes_read")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userBook UserBook @relation(fields: [userBookId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, userBookId, date])
+  @@map("reading_logs")
+}
+
+model BookNote {
+  id         String   @id @default(cuid())
+  userId     String   @map("user_id")
+  userBookId String   @map("user_book_id")
+  title      String
+  content    String
+  // type: NOTE | SUMMARY
+  type       String   @default("NOTE")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userBook UserBook @relation(fields: [userBookId], references: [id], onDelete: Cascade)
+
+  @@map("book_notes")
+}
+
+model BookFile {
+  id         String   @id @default(cuid())
+  userId     String   @map("user_id")
+  userBookId String   @map("user_book_id")
+  filename   String
+  fileUrl    String   @map("file_url")
+  fileSizeKb Int?     @map("file_size_kb")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userBook UserBook @relation(fields: [userBookId], references: [id], onDelete: Cascade)
+
+  @@map("book_files")
+}

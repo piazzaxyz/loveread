@@ -1,0 +1,20 @@
+.shell {
+  display: flex;
+  min-height: 100vh;
+  background: var(--bg-primary);
+}
+
+.main {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 100vh;
+}
+
+.withSidebar {
+  margin-left: var(--sidebar-width);
+  padding: 0;
+}
+
+.withBottomNav {
+  padding-bottom: var(--bottom-nav-height);
+}
