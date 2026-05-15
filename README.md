@@ -11,7 +11,7 @@ Aplicativo privado de gestão de leitura para a família. Acompanhe livros, regi
 | Usuário | E-mail | Senha |
 |---------|--------|-------|
 | Eduardo | `teamo@cantinho.app` | `1105` |
-| Ana | `ana@cantinho.app` | `teamo` |
+| Julia | `julia@cantinho.app` | `teamo` |
 
 ---
 
