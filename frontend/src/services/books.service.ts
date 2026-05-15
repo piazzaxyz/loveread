@@ -21,4 +21,6 @@ export const booksService = {
   removeBook: (id: string) => api.delete(`/books/library/${id}`),
 
   getAllUsers: () => api.get('/books/users'),
+
+  getPartnerLibrary: (userId: string) => api.get<UserBook[]>(`/books/library/user/${userId}`),
 }

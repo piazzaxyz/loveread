@@ -127,3 +127,11 @@ export async function getAllUsers() {
     select: { id: true, name: true, email: true, avatarUrl: true },
   })
 }
+
+export async function getPublicLibrary(userId: string) {
+  return prisma.userBook.findMany({
+    where: { userId },
+    include: { book: true },
+    orderBy: { updatedAt: 'desc' },
+  })
+}

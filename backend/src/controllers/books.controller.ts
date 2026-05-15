@@ -99,3 +99,12 @@ export async function getAllUsers(req: AuthRequest, res: Response): Promise<void
     res.status(400).json({ message: err.message })
   }
 }
+
+export async function getPartnerLibrary(req: AuthRequest, res: Response): Promise<void> {
+  try {
+    const library = await booksService.getPublicLibrary(req.params.userId as string)
+    res.json(library)
+  } catch (err: any) {
+    res.status(400).json({ message: err.message })
+  }
+}
