@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
-import { Trophy, Zap, BarChart2, PieChart as PieChartIcon, Heart, BookOpen, Flame } from 'lucide-react'
-import { DashboardData, UserStats } from '@/types'
+import { Trophy, Zap, BarChart2, PieChart as PieChartIcon, Heart, BookOpen, Flame, X, BookMarked } from 'lucide-react'
+import { DashboardData, UserStats, UserBook } from '@/types'
 import { dashboardService } from '@/services/dashboard.service'
+import { booksService } from '@/services/books.service'
 import { Card } from '@/components/ui/Card'
+import { Modal } from '@/components/ui/Modal'
 import {
   PieChart, Pie, Cell, Tooltip, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid,
 } from 'recharts'
@@ -10,13 +12,34 @@ import styles from './DashboardPage.module.css'
 
 const CHART_COLORS = ['#cba6f7', '#89b4fa', '#a6e3a1', '#f9e2af', '#fab387', '#f38ba8', '#94e2d5']
 
+const TOOLTIP_STYLE = {
+  background: 'var(--bg-card)',
+  border: '1px solid var(--border)',
+  borderRadius: '8px',
+  color: 'var(--text-primary)',
+}
+
 export function DashboardPage() {
   const [data, setData] = useState<DashboardData | null>(null)
   const [loading, setLoading] = useState(true)
+  const [partnerUser, setPartnerUser] = useState<UserStats | null>(null)
+  const [partnerBooks, setPartnerBooks] = useState<UserBook[]>([])
+  const [loadingPartner, setLoadingPartner] = useState(false)
 
   useEffect(() => {
     dashboardService.getDashboard().then((res) => setData(res.data)).finally(() => setLoading(false))
   }, [])
+
+  const openPartner = async (user: UserStats) => {
+    setPartnerUser(user)
+    setLoadingPartner(true)
+    try {
+      const res = await booksService.getPartnerLibrary(user.userId)
+      setPartnerBooks(res.data)
+    } finally {
+      setLoadingPartner(false)
+    }
+  }
 
   if (loading) {
     return (
@@ -42,7 +65,9 @@ export function DashboardPage() {
       <section>
         <h2 className={styles.sectionTitle}><Trophy size={18} /> Ranking de Leitores</h2>
         <div className={styles.leaderboard}>
-          {data.leaderboard.map((user, i) => <LeaderboardCard key={user.userId} user={user} rank={i + 1} />)}
+          {data.leaderboard.map((user, i) => (
+            <LeaderboardCard key={user.userId} user={user} rank={i + 1} onClick={() => openPartner(user)} />
+          ))}
         </div>
       </section>
 
@@ -56,7 +81,7 @@ export function DashboardPage() {
                   label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`} labelLine={false}>
                   {genreData.map((_, i) => <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />)}
                 </Pie>
-                <Tooltip contentStyle={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: '8px', color: 'var(--text-primary)' }} />
+                <Tooltip contentStyle={TOOLTIP_STYLE} />
               </PieChart>
             </ResponsiveContainer>
           </Card>
@@ -69,7 +94,7 @@ export function DashboardPage() {
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
                 <XAxis dataKey="name" tick={{ fill: 'var(--text-muted)', fontSize: 12 }} />
                 <YAxis tick={{ fill: 'var(--text-muted)', fontSize: 12 }} />
-                <Tooltip contentStyle={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: '8px', color: 'var(--text-primary)' }} />
+                <Tooltip contentStyle={TOOLTIP_STYLE} />
                 <Bar dataKey="lidos" fill="var(--accent)" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
@@ -104,15 +129,53 @@ export function DashboardPage() {
           </Card>
         </section>
       )}
+
+      <Modal
+        isOpen={!!partnerUser}
+        onClose={() => { setPartnerUser(null); setPartnerBooks([]) }}
+        title={`Biblioteca de ${partnerUser?.name}`}
+        size="lg"
+      >
+        {loadingPartner ? (
+          <div className={styles.loading}><div className={styles.spinner} /></div>
+        ) : partnerBooks.length === 0 ? (
+          <div className={styles.emptyPartner}>
+            <BookOpen size={48} color="var(--text-muted)" strokeWidth={1} />
+            <p>Nenhum livro na biblioteca ainda.</p>
+          </div>
+        ) : (
+          <div className={styles.partnerBooks}>
+            {partnerBooks.map((ub) => (
+              <div key={ub.id} className={styles.partnerBookItem}>
+                <BookMarked size={16} color="var(--accent)" />
+                <div className={styles.partnerBookInfo}>
+                  <span className={styles.partnerBookTitle}>{ub.book.title}</span>
+                  <span className={styles.partnerBookAuthor}>{ub.book.author}</span>
+                </div>
+                <span className={styles.partnerBookStatus}>{STATUS_PT[ub.status] || ub.status}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </Modal>
     </div>
   )
 }
 
-function LeaderboardCard({ user, rank }: { user: UserStats; rank: number }) {
-  const medals = ['🥇', '🥈', '🥉']
+const STATUS_PT: Record<string, string> = {
+  READING: 'Lendo',
+  READ: 'Lido',
+  WANT_TO_READ: 'Quero Ler',
+  WANT_TO_BUY: 'Quero Comprar',
+  ABANDONED: 'Abandonado',
+}
+
+const RANK_LABELS = ['1°', '2°', '3°']
+
+function LeaderboardCard({ user, rank, onClick }: { user: UserStats; rank: number; onClick: () => void }) {
   return (
-    <Card className={styles.leaderCard}>
-      <div className={styles.rankBadge}>{medals[rank - 1] || `#${rank}`}</div>
+    <Card className={styles.leaderCard} onClick={onClick} style={{ cursor: 'pointer' }}>
+      <div className={styles.rankBadge}>{RANK_LABELS[rank - 1] || `#${rank}`}</div>
       <div className={styles.leaderAvatar}>
         {user.avatarUrl ? <img src={user.avatarUrl} alt={user.name} /> : <span>{user.name[0].toUpperCase()}</span>}
       </div>

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { TrendingUp, FileText, Paperclip, Star, CalendarCheck } from 'lucide-react'
+import { TrendingUp, FileText, Paperclip, Star, CalendarCheck, Trash2 } from 'lucide-react'
 import { UserBook, ReadingStatus, STATUS_LABELS } from '@/types'
 import { Badge } from '@/components/ui/Badge'
 import { ProgressBar } from '@/components/ui/ProgressBar'
@@ -30,6 +30,7 @@ export function BookDetail({ userBook: initialUb, onUpdate, onClose }: BookDetai
   const [logPages, setLogPages] = useState('')
   const [logMinutes, setLogMinutes] = useState('')
   const [loggingSession, setLoggingSession] = useState(false)
+  const [deleting, setDeleting] = useState(false)
 
   const save = async () => {
     setSaving(true)
@@ -43,6 +44,18 @@ export function BookDetail({ userBook: initialUb, onUpdate, onClose }: BookDetai
       onUpdate()
     } finally {
       setSaving(false)
+    }
+  }
+
+  const deleteBook = async () => {
+    if (!confirm(`Remover "${ub.book.title}" da sua biblioteca?`)) return
+    setDeleting(true)
+    try {
+      await booksService.removeBook(ub.id)
+      onUpdate()
+      onClose()
+    } finally {
+      setDeleting(false)
     }
   }
 
@@ -143,6 +156,9 @@ export function BookDetail({ userBook: initialUb, onUpdate, onClose }: BookDetai
           </div>
 
           <Button onClick={save} loading={saving} fullWidth>Salvar Alterações</Button>
+          <Button variant="danger" onClick={deleteBook} loading={deleting} fullWidth>
+            <Trash2 size={14} /> Remover da Biblioteca
+          </Button>
 
           <div className={styles.divider} />
 
